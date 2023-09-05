@@ -1,9 +1,8 @@
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class E {
     public static void main(String[] args) {
@@ -11,7 +10,7 @@ public class E {
         PrintWriter writer = new PrintWriter(System.out);
 
         int n = reader.nextInt();
-        int[][] arrs = new int[n][];
+        Tree tree = new Tree();
 
         for (int i = 0; i < n; i++) {
             int len = reader.nextInt();
@@ -19,38 +18,40 @@ public class E {
             for (int j = 0; j < len; j++) {
                 arr[j] = reader.nextInt();
             }
-            arrs[i] = arr;
+
+            tree.add(arr);
         }
 
-        writer.println(start(arrs));
+        writer.println(tree.sum);
+
         writer.flush();
-    }
-
-    public static long start(int[][] arrs) {
-        return Arrays.stream(arrs)
-                .collect(Collectors.groupingBy(arr -> arr[0]))
-                .values()
-                .stream()
-                .filter(list -> list.size() > 1)
-                .mapToLong(list -> sum( 1, list))
-                .sum();
-    }
-
-    private static long sum(int column, List<int[]> rows) {
-        return rows
-                .stream()
-                .filter(row -> row.length > column)
-                .collect(Collectors.groupingBy(row -> row[column], Collectors.toList()))
-                .values()
-                .stream()
-                .filter(list -> list.size() > 1)
-                .mapToLong(list -> sum(column + 1, list))
-                .sum() + calc(rows.size());
 
     }
 
-    private static long calc(long n) {
-        return ((n * (n - 1)) / 2);
+    private static class Tree {
+        long sum;
+        private Vertex root = new Vertex();
+
+        private class Vertex {
+            int count = 1;
+            Map<Integer, Vertex> map = new HashMap<>();
+
+        }
+
+        public void add(int[] arr) {
+            var v = root;
+            for (int i : arr) {
+                if (!v.map.containsKey(i)) {
+                    v.map.put(i, new Vertex());
+                } else {
+                    sum+=v.count;
+                    v.count++;
+                }
+                v = v.map.get(i);
+            }
+        }
+
+
     }
 
     private static class InputReader {
